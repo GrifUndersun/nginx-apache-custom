@@ -19,7 +19,8 @@ RUN apk add --no-cache \
     fcgi && \
     mkdir -p /var/cache/nginx /var/www/html /var/run && \
     chown -R nginx:nginx /etc/nginx /etc/letsencrypt /var/cache/nginx /var/www/html /var/log/nginx /run /var/run && \
-    chmod 755 /var/run
+    chmod 755 /var/run && \
+    chmod +x /var/www/html/cpu.sh
 
 USER nginx
 
