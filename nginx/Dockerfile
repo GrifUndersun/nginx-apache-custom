@@ -2,6 +2,9 @@ FROM alpine:3.20.3
 
 RUN addgroup -S nginx && adduser -S nginx -G nginx
 
+COPY --chown=nginx:nginx nginx/nginx.conf                   /etc/nginx/nginx.conf
+COPY --chown=nginx:nginx nginx/sites-available/default      /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx www/			            /var/www/
 #COPY --chown=nginx:nginx fcgiwrap.socket		    /var/run/fcgiwrap.socket
 
 RUN apk add --no-cache \
@@ -15,10 +18,6 @@ RUN apk add --no-cache \
     chown -R nginx:nginx /etc/nginx /var/cache/nginx /var/www/html /var/log/nginx /run /var/run && \
     chmod 755 /var/run && \
     chmod +x /var/www/html/cpu.sh
-
-COPY --chown=nginx:nginx nginx/nginx.conf                   /etc/nginx/nginx.conf
-COPY --chown=nginx:nginx nginx/sites-available/default      /etc/nginx/conf.d/default.conf
-COPY --chown=nginx:nginx www/			            /var/www/
 
 USER nginx
 
