@@ -3,13 +3,7 @@ server {
 
 #    return 301 https://$host$request_uri;
 
-    listen [::]:443 ssl ipv6only=on; # managed by Certbot
-    listen 443 ssl; # managed by Certbot
-
-    ssl_certificate /etc/letsencrypt/live/trainee.webhop.me/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/trainee.webhop.me/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    listen 80;
 
     root /var/www/html;
     index index.html;
@@ -64,20 +58,6 @@ server {
    location /err {
 	proxy_pass https://localhost:9999;
    }
-
-}
-
-server {
-    if ($host = trainee.webhop.me) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
-    listen 80;
-    listen [::]:80;
-    server_name trainee.webhop.me;
-    return 404; # managed by Certbot
-
 
 }
 
