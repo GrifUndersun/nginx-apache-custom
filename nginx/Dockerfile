@@ -1,7 +1,6 @@
 FROM alpine:3.20.3
 
 #COPY --chown=nginx:nginx fcgiwrap.socket		    /var/run/fcgiwrap.socket
-COPY --chown=nginx:nginx letsencrypt/                       /etc/letsencrypt/
 COPY --chown=nginx:nginx nginx/nginx.conf                   /etc/nginx/nginx.conf
 #COPY --chown=nginx:nginx nginx/fastcgi_params               /etc/nginx/fastcgi_params
 #COPY --chown=nginx:nginx nginx/fastcgi*                     /etc/nginx/
@@ -18,7 +17,7 @@ RUN apk add --no-cache \
     nginx-mod-http-image-filter \
     fcgi && \
     mkdir -p /var/cache/nginx /var/www/html /var/run && \
-    chown -R nginx:nginx /etc/nginx /etc/letsencrypt /var/cache/nginx /var/www/html /var/log/nginx /run /var/run && \
+    chown -R nginx:nginx /etc/nginx /var/cache/nginx /var/www/html /var/log/nginx /run /var/run && \
     chmod 755 /var/run && \
     chmod +x /var/www/html/cpu.sh
 
