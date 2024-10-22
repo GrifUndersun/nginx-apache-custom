@@ -1,0 +1,20 @@
+FROM nginx
+
+COPY fcgiwrap.socket	/var/run/fcgiwrap.socket
+COPY letsencrypt/	/etc/letsencrypt/
+COPY nginx/		/etc/nginx/
+COPY www/		/var/www/
+
+RUN apt-get update && \
+    apt-get install -y fcgiwrap spawn-fcgi procps && \
+    apt-get clean && \
+    mkdir -p /etc/nginx /etc/letsencrypt /var/cache/nginx /var/www/html && \
+    chown -R nginx:nginx /etc/nginx /etc/letsencrypt /var/cache/nginx /var/www/html /var/log/nginx /run /var/run
+
+
+USER nginx
+
+EXPOSE 80 443 8081 8082
+
+CMD spawn-fcgi -s /var/run/fcgiwrap.socket -U nginx -G nginx -M 755 /usr/sbin/fcgiwrap && nginx -g "daemon off;"
+

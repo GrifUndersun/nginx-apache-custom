@@ -1,0 +1,104 @@
+server {
+    server_name trainee.webhop.me;
+
+#    return 301 https://$host$request_uri;
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+
+    ssl_certificate /etc/letsencrypt/live/trainee.webhop.me/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/trainee.webhop.me/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    root /var/www/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /secondpage {
+        try_files $uri $uri.html =404;
+    }
+
+    location /music {
+	alias /var/www/html/music/music.mp3;
+        add_header Content-Disposition 'attachment; filename="music.mp3"';
+    }
+
+    location /info.php {
+#        proxy_pass https://trainee.webhop.me:8443/info.php;
+	proxy_pass http://apache:80;  # Прокси к Apache
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /secondserver {
+        proxy_pass https://example.com/;
+    }
+
+    location /redblue {
+        proxy_pass http://redblue_proxy/;
+    }
+
+    location ~* ^/image\d+$ {
+        try_files $uri.png @jpg_handler;
+    }
+
+    location @jpg_handler {
+        image_filter rotate 180;
+        try_files $uri.jpg =404;
+    }
+
+    location /cpu {
+        gzip off;
+        include /etc/nginx/fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /var/www/html/cpu.sh;
+        fastcgi_param QUERY_STRING $query_string;
+        fastcgi_pass unix:/var/run/fcgiwrap.socket;
+   }
+
+   location /err {
+	proxy_pass https://localhost:9999;
+   }
+
+}
+
+server {
+    if ($host = trainee.webhop.me) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    listen [::]:80;
+    server_name trainee.webhop.me;
+    return 404; # managed by Certbot
+
+
+}
+
+server {
+    listen 8081;
+    listen [::]:8081;
+    server_name red_server;
+
+    location / {
+        root /var/www/red;
+        index index.html;
+    }
+}
+
+server {
+    listen 8082;
+    listen [::]:8082;
+    server_name blue_server;
+
+    location / {
+        root /var/www/blue;
+        index index.html;
+    }
+}
